@@ -424,7 +424,7 @@ post_install_check() {
       log_success "  ✔  ${name}"
     else
       log_warn "  ⚠  ${name}"
-      (( issues++ ))
+      (( issues += 1 ))
     fi
   }
 

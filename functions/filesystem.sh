@@ -170,7 +170,7 @@ dup() {
   while true; do
     newfile="${base}_${n}.${ext}"
     [[ ! -f "${newfile}" ]] && break
-    (( n++ ))
+    (( n += 1 ))
   done
 
   cp "${file}" "${newfile}"

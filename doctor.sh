@@ -26,7 +26,7 @@ _FAILED_CHECKS=0
 check_pass() {
   local name="$1"
   local detail="${2:-}"
-  (( _TOTAL_CHECKS++ )); (( _PASSED_CHECKS++ ))
+  (( _TOTAL_CHECKS += 1 )); (( _PASSED_CHECKS += 1 ))
   printf "  %b✔%b  %-40s %b%s%b\n" \
     "${CLR_BOLD_GREEN}" "${CLR_RESET}" "${name}" \
     "${CLR_DIM}" "${detail}" "${CLR_RESET}" >&2
@@ -35,7 +35,7 @@ check_pass() {
 check_warn() {
   local name="$1"
   local detail="${2:-}"
-  (( _TOTAL_CHECKS++ )); (( _WARNED_CHECKS++ ))
+  (( _TOTAL_CHECKS += 1 )); (( _WARNED_CHECKS += 1 ))
   printf "  %b⚠%b  %-40s %b%s%b\n" \
     "${CLR_BOLD_YELLOW}" "${CLR_RESET}" "${name}" \
     "${CLR_YELLOW}" "${detail}" "${CLR_RESET}" >&2
@@ -45,7 +45,7 @@ check_fail() {
   local name="$1"
   local detail="${2:-}"
   local fix="${3:-}"
-  (( _TOTAL_CHECKS++ )); (( _FAILED_CHECKS++ ))
+  (( _TOTAL_CHECKS += 1 )); (( _FAILED_CHECKS += 1 ))
   printf "  %b✖%b  %-40s %b%s%b\n" \
     "${CLR_BOLD_RED}" "${CLR_RESET}" "${name}" \
     "${CLR_RED}" "${detail}" "${CLR_RESET}" >&2
@@ -257,7 +257,7 @@ check_symlinks() {
     [[ -d "${dir}" ]] || continue
     while IFS= read -r link; do
       check_warn "Broken symlink" "${link}"
-      (( found++ ))
+      (( found += 1 ))
     done < <(find "${dir}" -maxdepth 3 -type l ! -e 2>/dev/null)
   done
 

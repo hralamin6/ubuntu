@@ -220,7 +220,7 @@ restore_all() {
       mkdir -p "${dest_dir}"
       cp -a "${backup_file_path}" "${original_path}"
       log_debug "  ✔ Restored: ${original_path}"
-      (( count++ ))
+      (( count += 1 ))
     fi
   done < <(find "${files_dir}" -type f -print0 2>/dev/null)
 
@@ -253,7 +253,7 @@ backup_list() {
       "${CLR_BOLD_CYAN}" "${ts}" "${CLR_RESET}" \
       "${CLR_GREEN}" "${file_count}" "${CLR_RESET}" \
       "${CLR_DIM}" "${created}" "${CLR_RESET}" >&2
-    (( count++ ))
+    (( count += 1 ))
   done < <(find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | sort -rz)
 
   if (( count == 0 )); then

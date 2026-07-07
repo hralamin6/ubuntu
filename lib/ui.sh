@@ -54,7 +54,7 @@ ui_spinner_start() {
       printf "\r%b  %s  %s%b" \
         "${CLR_BOLD_CYAN}" "${frames[$((i % ${#frames[@]}))]}" "${message}" "${CLR_RESET}" >&2
       sleep 0.08
-      (( i++ ))
+      (( i += 1 ))
     done
   } &
   _SPINNER_PID=$!
@@ -165,7 +165,7 @@ ui_select() {
   local i=1
   for opt in "${options[@]}"; do
     printf "  %b%d)%b %s\n" "${CLR_BOLD_CYAN}" "${i}" "${CLR_RESET}" "${opt}" >&2
-    (( i++ ))
+    (( i += 1 ))
   done
 
   local choice

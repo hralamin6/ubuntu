@@ -83,18 +83,18 @@ pkg_install_batch() {
     if dpkg-query -W -f='${Status}' "${pkg}" 2>/dev/null | \
        grep -q "install ok installed"; then
       log_debug "  ↷ ${pkg} (already installed)"
-      (( ok++ ))
+      (( ok += 1 ))
       continue
     fi
 
     if DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
          --no-install-recommends "${pkg}" &>/dev/null; then
       log_debug "  ✔ ${pkg}"
-      (( ok++ ))
+      (( ok += 1 ))
     else
       log_warn "  ⚠ ${pkg} — not available in repos, skipping."
       _PKG_INSTALL_ERRORS+=("${pkg}")
-      (( fail++ ))
+      (( fail += 1 ))
     fi
   done
 
