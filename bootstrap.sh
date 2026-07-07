@@ -176,11 +176,22 @@ install_binary_tools() {
   fi
 
   # --- Atuin ---
-  if ! command -v atuin &>/dev/null; then
+  if ! command -v atuin &>/dev/null && [[ ! -x "${HOME}/.atuin/bin/atuin" ]] && [[ ! -x "${HOME}/.local/bin/atuin" ]]; then
     log_info "Installing Atuin..."
-    curl --proto '=https' --tlsv1.2 -sSf \
-      https://setup.atuin.sh | sh &>/dev/null && \
-      log_success "Atuin installed." || log_warn "Atuin install failed."
+    local atuin_ver="18.3.0"
+    local atuin_arch="x86_64"
+    [[ "${arch}" == "arm64" ]] && atuin_arch="aarch64"
+    local atuin_url="https://github.com/atuinsh/atuin/releases/download/v${atuin_ver}/atuin-${atuin_arch}-unknown-linux-gnu.tar.gz"
+    local tmp
+    tmp=$(mktemp -d)
+    if curl -fsSL "${atuin_url}" -o "${tmp}/atuin.tar.gz" &>/dev/null && \
+       tar -xzf "${tmp}/atuin.tar.gz" -C "${tmp}" &>/dev/null; then
+      find "${tmp}" -name "atuin" -type f -exec install -m755 {} "${HOME}/.local/bin/atuin" \;
+      log_success "Atuin installed."
+    else
+      log_warn "Atuin install failed."
+    fi
+    rm -rf "${tmp}"
   else
     log_debug "Atuin already installed."
   fi

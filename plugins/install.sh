@@ -104,10 +104,14 @@ install_all_plugins() {
 
   for plugin_entry in "${PLUGINS[@]}"; do
     IFS='|' read -r name url branch <<< "${plugin_entry}"
-    (( current++ ))
+    current=$(( current + 1 ))
     log_step "${current}" "${total}" "${name}"
 
-    install_plugin "${name}" "${url}" "${branch}" && (( ok++ )) || (( fail++ ))
+    if install_plugin "${name}" "${url}" "${branch}"; then
+      ok=$(( ok + 1 ))
+    else
+      fail=$(( fail + 1 ))
+    fi
   done
 
   printf "\n"
