@@ -163,7 +163,7 @@ restore_file() {
   # Find latest backup session
   local latest_session
   latest_session=$(find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 \
-    -type d 2>/dev/null | sort -r | head -1)
+    -type d 2>/dev/null | sort -r | awk 'NR==1')
 
   if [[ -z "${latest_session}" ]]; then
     log_warn "No backup sessions found in ${CLI_BACKUP_ROOT}"
@@ -193,7 +193,7 @@ restore_all() {
 
   if [[ -z "${session}" ]]; then
     session=$(find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 \
-      -type d 2>/dev/null | sort -r | head -1)
+      -type d 2>/dev/null | sort -r | awk 'NR==1')
   fi
 
   if [[ -z "${session}" ]]; then

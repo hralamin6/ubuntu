@@ -30,7 +30,7 @@ main() {
   if command -v starship &>/dev/null; then
     log_info "Updating Starship..."
     curl -fsSL https://starship.rs/install.sh | sh -s -- --yes &>/dev/null && \
-      log_success "Starship updated to $(starship --version 2>/dev/null | head -1)" || \
+      log_success "Starship updated to $(starship --version 2>/dev/null | awk 'NR==1')" || \
       log_warn "Starship update failed."
   fi
 

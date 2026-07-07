@@ -86,7 +86,7 @@ detect_kernel() {
 # ---------------------------------------------------------------------------
 detect_shell() {
   DETECT_CURRENT_SHELL=$(basename "${SHELL:-/bin/sh}")
-  DETECT_SHELL_VERSION=$("${SHELL:-/bin/sh}" --version 2>/dev/null | head -1 || echo "unknown")
+  DETECT_SHELL_VERSION=$("${SHELL:-/bin/sh}" --version 2>/dev/null | awk 'NR==1' || echo "unknown")
   DETECT_ZSH_PATH=$(command -v zsh 2>/dev/null || echo "")
   DETECT_ZSH_VERSION=$(zsh --version 2>/dev/null | awk '{print $2}' || echo "not installed")
   export DETECT_CURRENT_SHELL DETECT_SHELL_VERSION
@@ -129,10 +129,10 @@ detect_terminal() {
 detect_package_manager() {
   if command -v apt-get &>/dev/null; then
     DETECT_PKG_MANAGER="apt"
-    DETECT_PKG_MANAGER_VERSION=$(apt-get --version 2>/dev/null | head -1 | awk '{print $2}')
+    DETECT_PKG_MANAGER_VERSION=$(apt-get --version 2>/dev/null | awk 'NR==1{print $2}')
   elif command -v apt &>/dev/null; then
     DETECT_PKG_MANAGER="apt"
-    DETECT_PKG_MANAGER_VERSION=$(apt --version 2>/dev/null | head -1 | awk '{print $2}')
+    DETECT_PKG_MANAGER_VERSION=$(apt --version 2>/dev/null | awk 'NR==1{print $2}')
   else
     DETECT_PKG_MANAGER="unknown"
     DETECT_PKG_MANAGER_VERSION="unknown"

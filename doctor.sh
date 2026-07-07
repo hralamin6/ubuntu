@@ -175,7 +175,7 @@ check_starship() {
     return
   fi
 
-  check_pass "starship binary" "$(starship --version 2>/dev/null | head -1)"
+  check_pass "starship binary" "$(starship --version 2>/dev/null | awk 'NR==1')"
 
   local config="${HOME}/.config/starship.toml"
   if [[ -f "${config}" ]]; then
