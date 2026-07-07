@@ -258,7 +258,7 @@ check_symlinks() {
     while IFS= read -r link; do
       check_warn "Broken symlink" "${link}"
       (( found += 1 ))
-    done < <(find "${dir}" -maxdepth 3 -type l ! -e 2>/dev/null)
+    done < <(find "${dir}" -maxdepth 3 -type l ! -e 2>/dev/null || true)
   done
 
   (( found == 0 )) && check_pass "Symlinks" "no broken symlinks found"

@@ -222,7 +222,7 @@ restore_all() {
       log_debug "  ✔ Restored: ${original_path}"
       (( count += 1 ))
     fi
-  done < <(find "${files_dir}" -type f -print0 2>/dev/null)
+  done < <(find "${files_dir}" -type f -print0 2>/dev/null || true)
 
   log_success "Restored ${count} file(s) from backup."
 }
@@ -254,7 +254,7 @@ backup_list() {
       "${CLR_GREEN}" "${file_count}" "${CLR_RESET}" \
       "${CLR_DIM}" "${created}" "${CLR_RESET}" >&2
     (( count += 1 ))
-  done < <(find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | sort -rz)
+  done < <(find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | sort -rz || true)
 
   if (( count == 0 )); then
     log_info "No backup sessions found."
@@ -270,7 +270,7 @@ backup_purge_old() {
   local keep="${1:-5}"
   local sessions
   mapfile -t sessions < <(
-    find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -r
+    find "${CLI_BACKUP_ROOT}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -r || true
   )
 
   local total=${#sessions[@]}
