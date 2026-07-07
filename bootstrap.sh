@@ -184,7 +184,7 @@ install_binary_tools() {
     local atuin_url="https://github.com/atuinsh/atuin/releases/download/v${atuin_ver}/atuin-${atuin_arch}-unknown-linux-gnu.tar.gz"
     local tmp
     tmp=$(mktemp -d)
-    if curl -fsSL "${atuin_url}" -o "${tmp}/atuin.tar.gz" &>/dev/null && \
+    if curl -fSL --progress-bar "${atuin_url}" -o "${tmp}/atuin.tar.gz" && \
        tar -xzf "${tmp}/atuin.tar.gz" -C "${tmp}" &>/dev/null; then
       find "${tmp}" -name "atuin" -type f -exec install -m755 {} "${HOME}/.local/bin/atuin" \;
       log_success "Atuin installed."
@@ -208,7 +208,7 @@ install_binary_tools() {
     fi
     local tmp
     tmp=$(mktemp -d)
-    if curl -fsSL "${delta_url}" -o "${tmp}/delta.tar.gz" &>/dev/null && \
+    if curl -fSL --progress-bar "${delta_url}" -o "${tmp}/delta.tar.gz" && \
        tar -xzf "${tmp}/delta.tar.gz" -C "${tmp}" &>/dev/null; then
       find "${tmp}" -name "delta" -type f -exec install -m755 {} "${HOME}/.local/bin/delta" \;
       log_success "git-delta installed."
@@ -230,7 +230,7 @@ install_binary_tools() {
     fi
     local tmp
     tmp=$(mktemp -d)
-    if curl -fsSL "${yazi_url}" -o "${tmp}/yazi.zip" &>/dev/null && \
+    if curl -fSL --progress-bar "${yazi_url}" -o "${tmp}/yazi.zip" && \
        unzip -q "${tmp}/yazi.zip" -d "${tmp}" &>/dev/null; then
       find "${tmp}" -name "yazi" -type f -exec install -m755 {} "${HOME}/.local/bin/yazi" \;
       log_success "Yazi installed."
@@ -267,7 +267,7 @@ install_binary_tools() {
     local tmp
     tmp=$(mktemp -d)
     local lg_url="https://github.com/jesseduffield/lazygit/releases/download/v${lg_ver}/lazygit_${lg_ver}_${lg_arch}.tar.gz"
-    if curl -fsSL "${lg_url}" -o "${tmp}/lazygit.tar.gz" &>/dev/null && \
+    if curl -fSL --progress-bar "${lg_url}" -o "${tmp}/lazygit.tar.gz" && \
        tar -xzf "${tmp}/lazygit.tar.gz" -C "${tmp}" &>/dev/null; then
       install -m755 "${tmp}/lazygit" "${HOME}/.local/bin/lazygit"
       log_success "lazygit installed."
