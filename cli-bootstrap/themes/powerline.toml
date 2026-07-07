@@ -1,0 +1,39 @@
+# themes/powerline.toml — Powerline-style Starship theme
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """[](bold blue)$os$username[](fg:blue bg:green)$directory[](fg:green bg:yellow)$git_branch$git_status[](fg:yellow bg:purple)$cmd_duration[](fg:purple) $character"""
+add_newline = false
+
+[os]
+disabled = false
+format = "[$symbol]($style)"
+style = "bg:blue fg:white bold"
+
+[username]
+show_always = true
+format = "[$user ]($style)"
+style_user = "bg:blue fg:white"
+style_root = "bg:blue fg:red bold"
+
+[directory]
+format = "[ $path ]($style)"
+style = "bg:green fg:black bold"
+truncation_length = 3
+
+[git_branch]
+format = "[ $symbol$branch ]($style)"
+symbol = " "
+style = "bg:yellow fg:black bold"
+
+[git_status]
+format = "[$all_status$ahead_behind ]($style)"
+style = "bg:yellow fg:black"
+
+[cmd_duration]
+format = "[ ⏱ $duration ]($style)"
+style = "bg:purple fg:white"
+min_time = 2000
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"

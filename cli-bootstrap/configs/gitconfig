@@ -1,0 +1,340 @@
+[core]
+	editor = nvim
+	autocrlf = input
+	safecrlf = warn
+	whitespace = fix,trailing-space,cr-at-eol
+	attributesfile = ~/.config/git/attributes
+	excludesfile = ~/.config/git/ignore
+	pager = delta
+	hooksPath = ~/.config/git/hooks
+
+[init]
+	defaultBranch = main
+
+[color]
+	ui = auto
+	diff = auto
+	status = auto
+	branch = auto
+	interactive = auto
+
+[color "branch"]
+	current = yellow bold
+	local = green bold
+	remote = cyan bold
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+
+[color "status"]
+	added = green bold
+	changed = yellow bold
+	untracked = red bold
+
+# ---------------------------------------------------------------------------
+# DELTA PAGER
+# ---------------------------------------------------------------------------
+[pager]
+	diff = delta
+	log = delta
+	reflog = delta
+	show = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	light = false
+	line-numbers = true
+	syntax-theme = Catppuccin Macchiato
+	side-by-side = false
+	file-style = bold yellow ul
+	file-decoration-style = none
+	hunk-header-style = file line-number syntax
+	hunk-header-decoration-style = blue box ul
+	line-numbers-left-style = blue
+	line-numbers-right-style = blue
+	line-numbers-minus-style = red bold
+	line-numbers-plus-style = green bold
+	minus-style = syntax "#3d1616"
+	minus-emph-style = syntax "#7a1c1c"
+	plus-style = syntax "#1a2e1a"
+	plus-emph-style = syntax "#1f4f1f"
+	blame-format = "{author:<18} {commit:<8} {timestamp:<15} "
+	grep-match-line-style = bold yellow
+	word-diff-regex = \w+
+
+# ---------------------------------------------------------------------------
+# MERGE / DIFF
+# ---------------------------------------------------------------------------
+[merge]
+	tool = vimdiff
+	conflictstyle = zdiff3
+	ff = false
+
+[mergetool]
+	prompt = false
+
+[mergetool "vimdiff"]
+	cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
+
+[diff]
+	tool = vimdiff
+	algorithm = histogram
+	colorMoved = default
+	mnemonicprefix = true
+	renames = copies
+
+[difftool]
+	prompt = false
+
+# ---------------------------------------------------------------------------
+# PULL / PUSH / FETCH
+# ---------------------------------------------------------------------------
+[pull]
+	rebase = true
+	ff = only
+
+[push]
+	default = current
+	followTags = true
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+	prunetags = false
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+	updateRefs = true
+
+# ---------------------------------------------------------------------------
+# BRANCH
+# ---------------------------------------------------------------------------
+[branch]
+	sort = -committerdate
+	autosetuprebase = always
+
+# ---------------------------------------------------------------------------
+# TAG
+# ---------------------------------------------------------------------------
+[tag]
+	sort = version:refname
+
+# ---------------------------------------------------------------------------
+# CREDENTIAL
+# ---------------------------------------------------------------------------
+[credential]
+	helper = store
+
+# ---------------------------------------------------------------------------
+# URL SHORTCUTS
+# ---------------------------------------------------------------------------
+[url "git@github.com:"]
+	insteadOf = gh:
+	insteadOf = github:
+
+[url "git@gitlab.com:"]
+	insteadOf = gl:
+	insteadOf = gitlab:
+
+[url "git@bitbucket.org:"]
+	insteadOf = bb:
+	insteadOf = bitbucket:
+
+# ---------------------------------------------------------------------------
+# PERFORMANCE
+# ---------------------------------------------------------------------------
+[core]
+	preloadindex = true
+	fsmonitor = true
+	untrackedcache = true
+
+[pack]
+	threads = 0
+
+# ---------------------------------------------------------------------------
+# ALIASES
+# ---------------------------------------------------------------------------
+[alias]
+	# --- Status ---
+	s    = status --short --branch
+	st   = status
+	ss   = status -s
+
+	# --- Logging ---
+	l    = log --oneline --graph --decorate --color
+	ll   = log --oneline --graph --decorate --all --color
+	lg   = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+	lp   = log --patch --stat
+	ls   = log --stat
+	ld   = log --diff-filter=D --summary  # Show deleted files
+	lr   = log --follow -p                # Follow renames
+
+	# --- Branching ---
+	b    = branch
+	ba   = branch --all
+	bd   = branch --delete
+	bD   = branch --delete --force
+	bm   = branch --move
+	bo   = branch -r                      # Remote branches
+	bc   = checkout -b                    # Create and switch
+	bls  = !git branch --sort=-committerdate --format='%(committerdate:short) %(refname:short)' | head -20
+
+	# --- Checkout ---
+	co   = checkout
+	com  = checkout main
+	cod  = checkout develop
+	cob  = checkout -b
+	cop  = checkout --patch
+
+	# --- Commit ---
+	c    = commit
+	cm   = commit --message
+	ca   = commit --amend
+	can  = commit --amend --no-edit
+	cane = commit --amend --no-edit
+	cf   = commit --fixup
+	cs   = commit --squash
+	cv   = commit --verbose
+
+	# --- Add / Stage ---
+	a    = add
+	aa   = add --all
+	ap   = add --patch
+	ai   = add --interactive
+	au   = add --update
+
+	# --- Diff ---
+	d    = diff
+	dc   = diff --cached
+	ds   = diff --stat
+	dw   = diff --word-diff
+	dn   = diff --name-only
+
+	# --- Stash ---
+	sl   = stash list
+	ss   = stash show --text
+	sp   = stash pop
+	sa   = stash apply
+	sd   = stash drop
+	sc   = stash clear
+	spu  = stash push
+	spk  = stash push --keep-index
+
+	# --- Remote ---
+	r    = remote -v
+	ra   = remote add
+	rr   = remote remove
+	ru   = remote update
+	rf   = remote prune origin
+
+	# --- Push / Pull ---
+	ps   = push
+	pso  = push origin
+	psf  = push --force-with-lease
+	pl   = pull
+	plo  = pull origin
+	plr  = pull --rebase
+
+	# --- Fetch ---
+	f    = fetch
+	fa   = fetch --all --prune
+	fo   = fetch origin
+
+	# --- Merge ---
+	m    = merge
+	ma   = merge --abort
+	mc   = merge --continue
+	mff  = merge --ff-only
+	mno  = merge --no-ff
+
+	# --- Rebase ---
+	rb   = rebase
+	rbi  = rebase --interactive
+	rba  = rebase --abort
+	rbc  = rebase --continue
+	rbs  = rebase --skip
+	rbm  = rebase main
+	rbd  = rebase develop
+
+	# --- Reset ---
+	unstage = reset HEAD --
+	undo    = reset --soft HEAD~1
+	nuke    = reset --hard HEAD
+	rh      = reset --hard
+	rs      = reset --soft
+	rm1     = reset HEAD~1 --mixed
+	rh1     = reset HEAD~1 --hard
+
+	# --- Cherry-pick ---
+	cp   = cherry-pick
+	cpa  = cherry-pick --abort
+	cpc  = cherry-pick --continue
+
+	# --- Tag ---
+	t    = tag
+	ta   = tag --annotate
+	tl   = tag --list
+	td   = tag --delete
+
+	# --- Submodule ---
+	sub  = submodule
+	subi = submodule init
+	subu = submodule update --init --recursive
+	subs = submodule sync
+
+	# --- Bisect ---
+	bi   = bisect
+	bis  = bisect start
+	big  = bisect good
+	bib  = bisect bad
+	bir  = bisect reset
+
+	# --- Worktree ---
+	wt   = worktree
+	wta  = worktree add
+	wtl  = worktree list
+	wtr  = worktree remove
+
+	# --- Utils ---
+	aliases    = config --get-regexp alias
+	upstream   = !git remote set-head origin -a
+	root       = rev-parse --show-toplevel
+	whoami     = !git config user.name && git config user.email
+	authors    = shortlog -sn --all
+	count      = !git log --oneline | wc -l
+	cleanup    = !git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d
+	prune-all  = !git fetch --all --prune && git remote prune origin
+	aliases    = !git config --list | grep 'alias\\.' | sed 's/alias\\.//g'
+	edit-unmerged = !f() { git diff --name-status --diff-filter=U | awk '{print $2}'; }; ${EDITOR:-nvim} $(f)
+	hub        = !gh
+	ignored    = ls-files --others --ignored --exclude-standard
+	size       = count-objects -vH
+	recent     = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
+	graph      = !git log --all --graph --decorate --oneline
+	standup    = !git log --since='yesterday' --author="$(git config user.email)" --oneline
+	today      = !git log --since=midnight --author="$(git config user.email)" --oneline
+	fzf-log    = !git log --oneline | fzf --preview 'git show {1}' | awk '{print $1}' | xargs git show
+
+# ---------------------------------------------------------------------------
+# USER — override in ~/.gitconfig.local
+# ---------------------------------------------------------------------------
+[include]
+	path = ~/.gitconfig.local
+
+# ---------------------------------------------------------------------------
+# SIGNING (GPG — uncomment if using)
+# ---------------------------------------------------------------------------
+# [commit]
+#   gpgsign = true
+# [tag]
+#   gpgsign = true
+# [gpg]
+#   program = gpg2

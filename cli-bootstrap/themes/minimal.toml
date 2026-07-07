@@ -1,0 +1,23 @@
+# themes/minimal.toml — Ultra-minimal Starship theme
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """$directory$git_branch$git_status$character"""
+add_newline = false
+
+[directory]
+format = "[$path]($style) "
+style  = "bold blue"
+truncation_length = 3
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = ""
+style  = "bold green"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style  = "bold red"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"

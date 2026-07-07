@@ -1,0 +1,379 @@
+# =============================================================================
+# ~/.zshrc — Interactive Zsh configuration
+# =============================================================================
+# cli-bootstrap — Production-quality CLI environment
+# Startup target: < 80ms
+# =============================================================================
+
+# Guard: only load in interactive shells
+[[ -o interactive ]] || return
+
+# ---------------------------------------------------------------------------
+# BOOTSTRAP ROOT — set by installer
+# ---------------------------------------------------------------------------
+export CLI_BOOTSTRAP_DIR="${CLI_BOOTSTRAP_DIR:-${HOME}/.cli-bootstrap}"
+export CLI_BOOTSTRAP_PLUGINS="${CLI_BOOTSTRAP_DIR}/plugins"
+export CLI_BOOTSTRAP_FUNCTIONS="${CLI_BOOTSTRAP_DIR}/functions"
+export CLI_BOOTSTRAP_ALIASES="${CLI_BOOTSTRAP_DIR}/aliases"
+
+# ---------------------------------------------------------------------------
+# ZSH CORE OPTIONS
+# ---------------------------------------------------------------------------
+
+# --- History ---
+setopt EXTENDED_HISTORY        # Save timestamp + duration
+setopt HIST_EXPIRE_DUPS_FIRST  # Expire dups first when at limit
+setopt HIST_IGNORE_DUPS        # Don't record duplicate consecutive entries
+setopt HIST_IGNORE_ALL_DUPS    # Delete old duplicates when new one added
+setopt HIST_FIND_NO_DUPS       # Don't show dups when searching
+setopt HIST_IGNORE_SPACE       # Don't record lines starting with space
+setopt HIST_SAVE_NO_DUPS       # Don't write dups to history file
+setopt HIST_REDUCE_BLANKS      # Remove extra blanks
+setopt HIST_VERIFY             # Show command before executing history expansion
+setopt SHARE_HISTORY           # Share history across all sessions
+setopt INC_APPEND_HISTORY_TIME # Append to history with timestamps incrementally
+
+# Ensure history directory exists
+[[ -d "${XDG_STATE_HOME}/zsh" ]] || mkdir -p "${XDG_STATE_HOME}/zsh"
+
+# --- Directory ---
+setopt AUTO_CD              # cd by typing directory name
+setopt AUTO_PUSHD           # Make cd push to directory stack
+setopt PUSHD_IGNORE_DUPS    # No dups in dir stack
+setopt PUSHD_MINUS          # Swap + and - in pushd
+setopt CDABLE_VARS          # cd to named directory variables
+
+# --- Globbing ---
+setopt EXTENDED_GLOB        # Use extended globbing (#, ~, ^)
+setopt GLOB_DOTS            # Include dotfiles in globs
+setopt NULL_GLOB            # No error if glob matches nothing
+setopt NUMERIC_GLOB_SORT    # Sort numeric filenames numerically
+
+# --- Completion ---
+setopt COMPLETE_IN_WORD     # Complete from anywhere in word
+setopt ALWAYS_TO_END        # Move cursor to end after completion
+setopt AUTO_MENU            # Show completion menu on second tab
+setopt AUTO_LIST            # Automatically list choices on ambiguity
+setopt LIST_PACKED          # Pack completion list
+setopt MENU_COMPLETE        # Auto-select first match
+
+# --- Misc ---
+setopt INTERACTIVE_COMMENTS  # Allow comments in interactive shell
+setopt NO_BEEP               # No beep
+setopt NO_FLOW_CONTROL        # Disable Ctrl+S/Ctrl+Q flow control
+setopt LONG_LIST_JOBS         # List jobs in long format
+setopt AUTO_RESUME           # Resume existing job before starting new one
+setopt NOTIFY                # Report status of background jobs immediately
+setopt PROMPT_SUBST          # Allow parameter expansion in prompts
+setopt CORRECT               # Correct spelling of commands
+setopt CORRECT_ALL           # Correct all words in command line
+
+# ---------------------------------------------------------------------------
+# COMPLETION SYSTEM
+# ---------------------------------------------------------------------------
+autoload -Uz compinit
+
+# Only regenerate compdump once per day for performance
+local _zcompdump="${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
+[[ -d "${XDG_CACHE_HOME}/zsh" ]] || mkdir -p "${XDG_CACHE_HOME}/zsh"
+
+if [[ -n "${_zcompdump}"(#qNmh+24) ]]; then
+  compinit -d "${_zcompdump}"
+else
+  compinit -C -d "${_zcompdump}"
+fi
+unset _zcompdump
+
+# Completion styling
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list \
+  '' 'm:{a-z}={A-Za-z}' '+m:{A-Za-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' verbose true
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+zstyle ':completion:*' completer _extensions _complete _approximate
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*' force-list always
+zstyle ':completion:*:*:killall:*' menu yes select
+
+# Cache completions
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/completion-cache"
+
+# ---------------------------------------------------------------------------
+# KEY BINDINGS
+# ---------------------------------------------------------------------------
+bindkey -e  # Emacs mode (use -v for vi mode)
+
+# Common key bindings
+bindkey '^[[1;5C' forward-word          # Ctrl+Right
+bindkey '^[[1;5D' backward-word         # Ctrl+Left
+bindkey '^[[3~'   delete-char           # Delete key
+bindkey '^[[H'    beginning-of-line     # Home
+bindkey '^[[F'    end-of-line           # End
+bindkey '^[[5~'   history-beginning-search-backward  # PgUp
+bindkey '^[[6~'   history-beginning-search-forward   # PgDn
+bindkey '^P'      up-history            # Ctrl+P
+bindkey '^N'      down-history          # Ctrl+N
+bindkey '^[.'     insert-last-word      # Alt+.
+bindkey '^[b'     backward-word        # Alt+B
+bindkey '^[f'     forward-word         # Alt+F
+
+# History search (loaded after plugins)
+# bindkey '^[[A'   history-substring-search-up
+# bindkey '^[[B'   history-substring-search-down
+
+# ---------------------------------------------------------------------------
+# PLUGINS
+# ---------------------------------------------------------------------------
+__load_plugin() {
+  local plugin_file="$1"
+  [[ -f "${plugin_file}" ]] && source "${plugin_file}"
+}
+
+# --- zsh-autosuggestions ---
+__load_plugin "${CLI_BOOTSTRAP_PLUGINS}/zsh-autosuggestions/zsh-autosuggestions.zsh"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6c7086,underline"
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+bindkey '^[[Z' autosuggest-accept     # Shift+Tab to accept suggestion
+bindkey '^]'   autosuggest-accept     # Also Ctrl+] for tmux compat
+
+# --- zsh-completions ---
+if [[ -d "${CLI_BOOTSTRAP_PLUGINS}/zsh-completions/src" ]]; then
+  fpath=("${CLI_BOOTSTRAP_PLUGINS}/zsh-completions/src" "${fpath[@]}")
+fi
+
+# --- fzf-tab (must be loaded BEFORE syntax-highlighting) ---
+__load_plugin "${CLI_BOOTSTRAP_PLUGINS}/fzf-tab/fzf-tab.plugin.zsh"
+# Configure fzf-tab
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+zstyle ':fzf-tab:*' default-color $'\033[0m'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --color=always $realpath 2>/dev/null | head -80'
+zstyle ':fzf-tab:complete:*:*' fzf-preview '
+  if [[ -f ${realpath} ]]; then
+    bat --color=always --style=numbers --line-range=:200 ${realpath} 2>/dev/null
+  elif [[ -d ${realpath} ]]; then
+    eza --tree --color=always ${realpath} 2>/dev/null | head -80
+  fi
+'
+zstyle ':fzf-tab:*' fzf-flags --height=60% --border=rounded
+
+# --- zsh-syntax-highlighting (must be LAST among plugins) ---
+__load_plugin "${CLI_BOOTSTRAP_PLUGINS}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+ZSH_HIGHLIGHT_STYLES[default]=none
+ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red,bold
+ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
+ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
+ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
+ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
+ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
+ZSH_HIGHLIGHT_STYLES[path]=bold
+ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
+ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue,bold
+ZSH_HIGHLIGHT_STYLES[command-substitution]=none
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
+ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta
+ZSH_HIGHLIGHT_STYLES[assign]=none
+ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
+ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
+
+# --- history-substring-search ---
+__load_plugin "${CLI_BOOTSTRAP_PLUGINS}/zsh-history-substring-search/zsh-history-substring-search.zsh"
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=magenta,fg=white,bold'
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='bg=red,fg=white,bold'
+HISTORY_SUBSTRING_SEARCH_FUZZY=1
+bindkey '^[[A' history-substring-search-up    # Up arrow
+bindkey '^[[B' history-substring-search-down  # Down arrow
+bindkey '^P'   history-substring-search-up
+bindkey '^N'   history-substring-search-down
+
+# --- you-should-use ---
+__load_plugin "${CLI_BOOTSTRAP_PLUGINS}/zsh-you-should-use/you-should-use.plugin.zsh"
+export YSU_MESSAGE_POSITION="after"
+export YSU_MODE=ALL
+
+# --- alias-tips ---
+__load_plugin "${CLI_BOOTSTRAP_PLUGINS}/alias-tips/alias-tips.plugin.zsh"
+
+# ---------------------------------------------------------------------------
+# FUNCTIONS — load all function files
+# ---------------------------------------------------------------------------
+if [[ -d "${CLI_BOOTSTRAP_FUNCTIONS}" ]]; then
+  for _func_file in "${CLI_BOOTSTRAP_FUNCTIONS}"/*.sh; do
+    [[ -f "${_func_file}" ]] && source "${_func_file}"
+  done
+  unset _func_file
+fi
+
+# ---------------------------------------------------------------------------
+# ALIASES — load all alias files
+# ---------------------------------------------------------------------------
+if [[ -d "${CLI_BOOTSTRAP_ALIASES}" ]]; then
+  for _alias_file in "${CLI_BOOTSTRAP_ALIASES}"/*.sh; do
+    [[ -f "${_alias_file}" ]] && source "${_alias_file}"
+  done
+  unset _alias_file
+fi
+
+# ---------------------------------------------------------------------------
+# FZF INTEGRATION
+# ---------------------------------------------------------------------------
+if [[ -f "${HOME}/.fzf.zsh" ]]; then
+  source "${HOME}/.fzf.zsh"
+elif command -v fzf &>/dev/null; then
+  source <(fzf --zsh 2>/dev/null) || true
+fi
+
+# ---------------------------------------------------------------------------
+# ZOXIDE
+# ---------------------------------------------------------------------------
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh --cmd cd)"
+fi
+
+# ---------------------------------------------------------------------------
+# ATUIN — Shell history
+# ---------------------------------------------------------------------------
+if command -v atuin &>/dev/null; then
+  eval "$(atuin init zsh --disable-up-arrow)"
+fi
+
+# ---------------------------------------------------------------------------
+# DIRENV
+# ---------------------------------------------------------------------------
+if command -v direnv &>/dev/null; then
+  eval "$(direnv hook zsh)"
+fi
+
+# ---------------------------------------------------------------------------
+# THEFUCK
+# ---------------------------------------------------------------------------
+if command -v thefuck &>/dev/null; then
+  eval "$(thefuck --alias 2>/dev/null)"
+fi
+
+# ---------------------------------------------------------------------------
+# YAZI SHELL WRAPPER
+# ---------------------------------------------------------------------------
+if command -v yazi &>/dev/null; then
+  function y() {
+    local tmp
+    tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    yazi "$@" --cwd-file="${tmp}"
+    if cwd="$(cat -- "${tmp}")" && [ -n "${cwd}" ] && [ "${cwd}" != "${PWD}" ]; then
+      builtin cd -- "${cwd}"
+    fi
+    rm -f -- "${tmp}"
+  }
+fi
+
+# ---------------------------------------------------------------------------
+# STARSHIP PROMPT
+# ---------------------------------------------------------------------------
+if command -v starship &>/dev/null; then
+  export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship.toml"
+  eval "$(starship init zsh)"
+fi
+
+# ---------------------------------------------------------------------------
+# LAZY LOADERS (expensive tools — only loaded when first used)
+# ---------------------------------------------------------------------------
+
+# NVM — lazy load
+if [[ -d "${HOME}/.nvm" ]]; then
+  export NVM_DIR="${HOME}/.nvm"
+  nvm() {
+    unfunction nvm
+    [ -s "${NVM_DIR}/nvm.sh" ] && source "${NVM_DIR}/nvm.sh" --no-use
+    nvm "$@"
+  }
+fi
+
+# pyenv — lazy load
+if [[ -d "${HOME}/.pyenv" ]]; then
+  export PYENV_ROOT="${HOME}/.pyenv"
+  path=("${PYENV_ROOT}/bin" "${path[@]}")
+  pyenv() {
+    unfunction pyenv
+    eval "$(command pyenv init -)"
+    pyenv "$@"
+  }
+fi
+
+# rbenv — lazy load
+if command -v rbenv &>/dev/null; then
+  rbenv() {
+    unfunction rbenv
+    eval "$(command rbenv init -)"
+    rbenv "$@"
+  }
+fi
+
+# SDKMAN — lazy load
+if [[ -d "${HOME}/.sdkman" ]]; then
+  sdk() {
+    export SDKMAN_DIR="${HOME}/.sdkman"
+    unfunction sdk
+    source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+    sdk "$@"
+  }
+fi
+
+# ---------------------------------------------------------------------------
+# NAMED DIRECTORIES
+# ---------------------------------------------------------------------------
+hash -d code="${HOME}/code"
+hash -d projects="${HOME}/projects"
+hash -d dl="${HOME}/Downloads"
+hash -d conf="${HOME}/.config"
+hash -d dot="${HOME}/.dotfiles"
+hash -d log="/var/log"
+hash -d etc="/etc"
+
+# ---------------------------------------------------------------------------
+# LS_COLORS — use vivid if available
+# ---------------------------------------------------------------------------
+if command -v vivid &>/dev/null; then
+  export LS_COLORS="$(vivid generate catppuccin-macchiato 2>/dev/null || vivid generate molokai 2>/dev/null)"
+elif [[ -f "${HOME}/.dir_colors" ]]; then
+  eval "$(dircolors -b "${HOME}/.dir_colors")"
+else
+  eval "$(dircolors -b 2>/dev/null || true)"
+fi
+
+# ---------------------------------------------------------------------------
+# TITLE BAR (set terminal title to user@host:dir)
+# ---------------------------------------------------------------------------
+if [[ "${TERM}" =~ xterm|rxvt|screen|tmux ]]; then
+  function _set_terminal_title() {
+    printf '\033]2;%s@%s:%s\a' "${USER}" "${HOST%.*}" "${${PWD/#${HOME}/\~}}"
+  }
+  add-zsh-hook precmd _set_terminal_title
+fi
+
+# ---------------------------------------------------------------------------
+# PERFORMANCE MEASUREMENT
+# ---------------------------------------------------------------------------
+# Uncomment to profile startup time:
+# zprof
+
+# ---------------------------------------------------------------------------
+# LOCAL OVERRIDES — user-specific configuration
+# ---------------------------------------------------------------------------
+[[ -f "${HOME}/.zshrc.local" ]] && source "${HOME}/.zshrc.local"
+
+# ---------------------------------------------------------------------------
+# CLEANUP
+# ---------------------------------------------------------------------------
+unfunction __load_plugin 2>/dev/null || true

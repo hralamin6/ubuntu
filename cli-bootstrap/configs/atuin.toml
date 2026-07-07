@@ -1,0 +1,104 @@
+# =============================================================================
+# ~/.config/atuin/config.toml — Atuin shell history configuration
+# =============================================================================
+# cli-bootstrap — Fuzzy history search with SQLite backend
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# GENERAL
+# ---------------------------------------------------------------------------
+
+# Database path (default is ~/.local/share/atuin/history.db)
+db_path = "~/.local/share/atuin/history.db"
+
+# Key path (for sync — disabled by default)
+key_path = "~/.local/share/atuin/key"
+
+# Session path
+session_path = "~/.local/share/atuin/session"
+
+# Dialect: us or uk (affects date parsing)
+dialect = "us"
+
+# Auto update check
+auto_update = false
+
+# ---------------------------------------------------------------------------
+# HISTORY BEHAVIOR
+# ---------------------------------------------------------------------------
+
+# Update last command's exit code when shell exits
+update_last_check = false
+
+# Don't filter history by hostname by default (search all sessions)
+filter_mode = "global"
+
+# Filter mode for history navigation (use current session for up/down keys)
+filter_mode_shell_up_key_binding = "session"
+
+# Search mode: fuzzy, full-text, or prefix
+search_mode = "fuzzy"
+
+# Search mode used when pressing Up key
+search_mode_shell_up_key_binding = "prefix"
+
+# Maximum history entries (0 = unlimited)
+history_limit = 0
+
+# Ignore commands matching these prefixes
+history_filter = [
+  "^secret",
+  "^pass",
+  "^GITHUB_TOKEN",
+  "^AWS_SECRET",
+  "^export.*TOKEN",
+  "^export.*SECRET",
+  "^export.*PASSWORD",
+  "^export.*KEY",
+]
+
+# ---------------------------------------------------------------------------
+# UI
+# ---------------------------------------------------------------------------
+
+# Style: auto, full, compact
+style = "auto"
+
+# Show preview of commands in search
+show_preview = true
+
+# Maximum preview height in lines
+max_preview_height = 4
+
+# Show help on startup
+show_help = true
+
+# Invert the TUI (show newest at top)
+invert = false
+
+# Exit immediately if there's only one result
+exit_mode = "return-original"
+
+# ---------------------------------------------------------------------------
+# KEYBOARD
+# ---------------------------------------------------------------------------
+
+# Enter accepts and executes immediately (false = just fills the line)
+enter_accept = true
+
+# ---------------------------------------------------------------------------
+# SYNC — DISABLED (enable and configure if you want cloud sync)
+# ---------------------------------------------------------------------------
+
+# sync_address = "https://api.atuin.sh"
+# sync_frequency = "10m"
+# auto_sync = false
+
+# ---------------------------------------------------------------------------
+# DAEMON (background sync daemon — disabled)
+# ---------------------------------------------------------------------------
+[daemon]
+enabled = false
+sync_frequency = 300
+# socket_path = "~/.local/share/atuin/atuin.sock"
+# systemd_socket = false

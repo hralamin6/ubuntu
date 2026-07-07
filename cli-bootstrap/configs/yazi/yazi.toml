@@ -1,0 +1,82 @@
+# =============================================================================
+# ~/.config/yazi/yazi.toml — Yazi file manager configuration
+# =============================================================================
+
+[manager]
+ratio          = [1, 3, 4]
+sort_by        = "natural"
+sort_sensitive = false
+sort_reverse   = false
+sort_dir_first = true
+show_hidden    = true
+show_symlink   = true
+linemode       = "permissions"
+
+[preview]
+max_width  = 1200
+max_height = 900
+cache_dir  = "~/.cache/yazi"
+image_filter = "triangle"
+image_quality = 75
+sixel_fraction = 15
+ueberzug_scale = 1
+ueberzug_offset = [0, 0, 0, 0]
+
+[opener]
+edit   = [{ run = '${EDITOR:-nvim} "$@"', block = true }]
+open   = [{ run = 'xdg-open "$@"',        desc = "Open" }]
+play   = [{ run = 'mpv "$@"',             orphan = true }]
+view   = [{ run = 'bat --paging=always "$@"', block = true }]
+
+[open]
+rules = [
+  { name = "*/",                                      use = "edit"  },
+  { mime = "text/*",                                  use = "edit"  },
+  { mime = "image/*",                                 use = "open"  },
+  { mime = "video/*",                                 use = "play"  },
+  { mime = "audio/*",                                 use = "play"  },
+  { mime = "inode/x-empty",                           use = "edit"  },
+  { mime = "application/json",                        use = "edit"  },
+  { mime = "application/x-yaml",                      use = "edit"  },
+  { mime = "application/x-sh",                        use = "edit"  },
+  { mime = "application/pdf",                         use = "open"  },
+  { mime = "application/zip",                         use = "view"  },
+  { mime = "application/gzip",                        use = "view"  },
+  { mime = "application/x-tar",                       use = "view"  },
+]
+
+[tasks]
+micro_workers    = 10
+macro_workers    = 25
+bizarre_retry    = 5
+image_alloc      = 536870912
+image_bound      = [0, 0]
+suppress_preload = false
+
+[plugin]
+preloaders = [
+  { mime = "image/*",       run = "image"  },
+  { mime = "video/*",       run = "video"  },
+  { mime = "application/pdf", run = "pdf"  },
+  { mime = "text/*",        run = "code"   },
+]
+previewers = [
+  { name = "*/",            run = "folder" },
+  { mime = "text/*",        run = "code"   },
+  { mime = "image/*",       run = "image"  },
+  { mime = "video/*",       run = "video"  },
+  { mime = "audio/*",       run = "audio"  },
+  { mime = "application/pdf", run = "pdf"  },
+  { mime = "application/zip", run = "archive" },
+  { mime = "application/gzip", run = "archive" },
+  { mime = "application/x-bzip", run = "archive" },
+  { mime = "application/x-7z-compressed", run = "archive" },
+  { mime = "application/x-rar", run = "archive" },
+  { mime = "application/x-tar", run = "archive" },
+]
+
+[input]
+cursor_blink = true
+
+[log]
+enabled = false
