@@ -168,8 +168,8 @@ trap '__exit_handler TERM'   TERM
 # UTILITY HELPERS
 # ---------------------------------------------------------------------------
 die()              { log_error "$@"; exit 1; }
-require_root()     { [[ "${EUID}" -ne 0 ]] && die "Requires root. Run with sudo."; }
-require_nonroot()  { [[ "${EUID}" -eq 0 ]] && die "Do not run as root."; }
+require_root()     { [[ "${EUID}" -ne 0 ]] && die "Requires root. Run with sudo." || true; }
+require_nonroot()  { [[ "${EUID}" -eq 0 ]] && die "Do not run as root." || true; }
 is_interactive()   { [[ -t 0 && -t 1 ]]; }
 command_exists()   { command -v "$1" &>/dev/null; }
 is_ci()            { [[ -n "${CI:-}${GITHUB_ACTIONS:-}${GITLAB_CI:-}" ]]; }
